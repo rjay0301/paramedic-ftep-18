@@ -5,6 +5,7 @@ import { generatePhasePdf } from '@/services/pdf';
 import { Student } from '@/types/coordinator';
 import { PhaseType } from '@/services/pdf';
 import { supabase } from '@/integrations/supabase/client';
+const sb = supabase as any;
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
@@ -48,36 +49,32 @@ export const usePdfGeneration = () => {
       });
       
       // Get the form submission details
-      const { data: submission, error: submissionError } = await supabase
-        .from('form_submissions')
+      const { data: assignment, error: submissionError } = await sb
+        .from('assignments')
         .select('*')
         .eq('id', formId)
         .single();
       
-      if (submissionError || !submission) {
-        throw new Error('Failed to retrieve form submission');
+      if (submissionError || !assignment) {
+        throw new Error('Failed to retrieve assignment');
       }
       
       console.log("Form submission details:", submission);
       
       // Get the actual form data
-      const { data: formData, error: formError } = await supabase
-        .from(submission.form_type)
-        .select('*')
-        .eq('id', submission.form_id)
-        .single();
+      const formData = assignment;
       
-      if (formError || !formData) {
+      if (!formData) {
         throw new Error('Failed to retrieve form data');
       }
       
       console.log("Form data retrieved:", formData);
       
       // Get complete student information
-      const { data: student, error: studentError } = await supabase
+      const { data: student, error: studentError } = await sb
         .from('students')
-        .select('id, full_name, email, alpha_unit_text, hub_name, ftp_name, ftp_contact, corp_id')
-        .eq('id', submission.student_id)
+        .select('id, full_name, email')
+        .eq('id', assignment.student_id)
         .single();
       
       if (studentError || !student) {
@@ -90,8 +87,8 @@ export const usePdfGeneration = () => {
       let processedContent = formData;
       
       // Special handling for assignments
-      if (submission.form_type === 'assignments' && formData.content) {
-        console.log('Processing assignment content for PDF:', formData.content);
+      if ((formData as any).content) {
+        console.log('Processing assignment content for PDF:', (formData as any).content);
         
         let assignmentData: {
           assignmentNumber?: number;
@@ -101,8 +98,8 @@ export const usePdfGeneration = () => {
           assignmentAnswer?: string;
         } = {};
         
-        // Get assignment metadata from the form number
-        switch(submission.form_number) {
+        // Get assignment metadata from the assignment number
+        switch(assignment.assignment_number) {
           case 1:
             assignmentData.assignmentTitle = "Ambulance Inventory";
             assignmentData.assignmentDescription = "Complete a full inventory of the ambulance during the shift.";
@@ -134,53 +131,47 @@ export const usePdfGeneration = () => {
             assignmentData.assignmentQuestion = "Write down the format for updating CCD and briefly state what information should be included in ALL updates:";
             break;
           default:
-            assignmentData.assignmentTitle = `Assignment ${submission.form_number}`;
+            assignmentData.assignmentTitle = `Assignment ${assignment.assignment_number}`;
             assignmentData.assignmentDescription = "Complete the assignment as instructed.";
             break;
         }
         
-        assignmentData.assignmentNumber = submission.form_number;
+        assignmentData.assignmentNumber = assignment.assignment_number;
         
+        const contentVal: any = (formData as any).content;
         // Extract the answer from the content
-        if (typeof formData.content === 'object' && formData.content !== null) {
-          const assignmentContent = formData.content as Record<string, any>;
+        if (typeof contentVal === 'object' && contentVal !== null) {
+          const assignmentContent = contentVal as Record<string, any>;
           
-          // Try different possible structures
           if (assignmentContent.content) {
             if (typeof assignmentContent.content === 'string') {
               assignmentData.assignmentAnswer = assignmentContent.content;
             } else if (typeof assignmentContent.content === 'object' && assignmentContent.content !== null) {
-              // Try to extract answer from nested content object
               assignmentData.assignmentAnswer = JSON.stringify(assignmentContent.content, null, 2);
             }
           } else {
-            // Try to find the answer directly in the assignment content
             for (const key of ['answer', 'response', 'text', 'value', 'assignmentAnswer']) {
               if (typeof assignmentContent[key] === 'string') {
                 assignmentData.assignmentAnswer = assignmentContent[key];
                 break;
               }
             }
-            
-            // If still not found, use the whole content as string
             if (!assignmentData.assignmentAnswer) {
               assignmentData.assignmentAnswer = JSON.stringify(assignmentContent, null, 2);
             }
           }
-        } else if (typeof formData.content === 'string') {
-          // If content is already a string, use it directly
-          assignmentData.assignmentAnswer = formData.content;
+        } else if (typeof contentVal === 'string') {
+          assignmentData.assignmentAnswer = contentVal;
         } else {
-          // Fallback
           try {
-            assignmentData.assignmentAnswer = JSON.stringify(formData.content);
+            assignmentData.assignmentAnswer = JSON.stringify(contentVal);
           } catch (e) {
             assignmentData.assignmentAnswer = "Content not available in a readable format";
           }
         }
         
         processedContent = {
-          ...formData,
+          ...(formData as any),
           assignmentData
         };
       }
@@ -194,7 +185,7 @@ export const usePdfGeneration = () => {
       
       // Set up document properties
       pdf.setProperties({
-        title: `${student.full_name} - ${submission.form_type.replace(/_/g, ' ')} #${submission.form_number}`,
+        title: `${student.full_name} - assignment #${assignment.assignment_number}`,
         subject: 'FTEP Workbook Form',
         author: 'HMCAS FTEP System',
         creator: 'HMCAS FTEP System'

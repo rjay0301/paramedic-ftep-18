@@ -1,6 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/services/form/utils/loggerService';
+const sb = supabase as any;
 
 /**
  * Updates form submission in the database
@@ -16,19 +17,14 @@ export const updateFormSubmission = async (
     assignmentNumber 
   });
   
-  const response = await supabase
-    .from('form_submissions')
-    .upsert({
-      student_id: studentId,
-      form_id: assignmentId,
-      form_type: 'assignments',
-      form_number: assignmentNumber,
+  const response = await sb
+    .from('assignments')
+    .update({
       status: 'submitted',
-      submitted_at: new Date().toISOString()
-    }, { 
-      onConflict: 'student_id,form_type,form_number',
-      ignoreDuplicates: false
-    });
+      submitted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', assignmentId);
     
   if (response.error) {
     logger.error('Error updating form submission entry', response.error, { 

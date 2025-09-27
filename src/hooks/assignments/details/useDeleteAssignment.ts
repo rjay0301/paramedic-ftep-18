@@ -5,6 +5,7 @@ import { useStudentId } from '@/hooks/assignments/useStudentId';
 import { logger } from '@/services/form/utils/loggerService';
 import { diagnosticService } from '@/services/form/utils/diagnosticService';
 import { supabase } from '@/integrations/supabase/client';
+const sb = supabase as any;
 
 export const useDeleteAssignment = (
   setAssignments: React.Dispatch<React.SetStateAction<any>>,
@@ -36,19 +37,13 @@ export const useDeleteAssignment = (
       const assignmentNumber = parseInt(assignmentKey.replace('assignment', ''));
       
       // Delete assignment from database if it exists
-      await supabase
+      await sb
         .from('assignments')
         .delete()
         .eq('student_id', studentId)
         .eq('assignment_number', assignmentNumber);
         
-      // Also delete from form_submissions to maintain consistency
-      await supabase
-        .from('form_submissions')
-        .delete()
-        .eq('student_id', studentId)
-        .eq('form_type', 'assignments')
-        .eq('form_number', assignmentNumber);
+      // Removed legacy form_submissions cleanup (table not used)
         
       // Clear the content in the local state
       setAssignments(prev => ({

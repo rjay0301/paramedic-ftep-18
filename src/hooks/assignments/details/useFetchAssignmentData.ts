@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { useStudentId } from '@/hooks/assignments/useStudentId';
 import { logger } from '@/services/form/utils/loggerService';
 import { supabase } from '@/integrations/supabase/client';
+const sb = supabase as any;
 
 export const useFetchAssignmentData = () => {
   const { getStudentId } = useStudentId();
@@ -20,7 +21,7 @@ export const useFetchAssignmentData = () => {
     const assignmentNumber = parseInt(assignmentKey.replace('assignment', ''));
     
     // Check if assignment exists
-    const { data: existingAssignment, error: fetchError } = await supabase
+    const { data: existingAssignment, error: fetchError } = await sb
       .from('assignments')
       .select('content, status')
       .eq('student_id', studentId)
@@ -33,9 +34,9 @@ export const useFetchAssignmentData = () => {
     }
     
     if (existingAssignment) {
-      const contentValue = existingAssignment.content?.content || '';
+      const contentValue = (existingAssignment as any)?.content?.content || '';
       
-      setAssignments(prev => ({
+      setAssignments((prev: any) => ({
         ...prev,
         [assignmentKey]: { content: contentValue }
       }));

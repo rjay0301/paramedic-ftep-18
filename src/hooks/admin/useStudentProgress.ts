@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+const sb = supabase as any;
 
 interface StudentProgressSummary {
   id: string;
@@ -69,8 +70,8 @@ export const useStudentProgress = () => {
             completed_forms: progress?.completed_forms || 0,
             total_forms: progress?.total_forms || 0,
             overall_percentage: progress?.overall_percentage || 0,
-            completed_phases: progress?.completed_phases || 0,
-            total_phases: progress?.total_phases || 0,
+            completed_phases: (progress as any)?.completed_phases || 0,
+            total_phases: (progress as any)?.total_phases || 0,
           };
         })
       );
@@ -91,14 +92,14 @@ export const useStudentProgress = () => {
     try {
       setPhaseLoading(true);
       
-      const { data, error } = await supabase
+      const { data, error } = await sb
         .from('student_phase_progress')
         .select('*')
         .eq('student_id', studentId);
 
       if (error) throw error;
 
-      setPhaseProgress(data || []);
+      setPhaseProgress((data as PhaseProgress[]) || []);
     } catch (err: any) {
       console.error('Error fetching phase progress:', err);
       toast.error('Failed to load phase progress details');
@@ -112,7 +113,7 @@ export const useStudentProgress = () => {
       setLoading(true);
       
       // Call recalculate_student_progress function
-      const { error } = await supabase.rpc('recalculate_student_progress', {
+      const { error } = await (sb).rpc('recalculate_student_progress', {
         p_student_id: studentId
       });
 

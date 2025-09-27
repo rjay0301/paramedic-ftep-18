@@ -36,7 +36,18 @@ export const useAdminUsers = () => {
         throw error;
       }
       
-      setUsers(data || []);
+      // Map role to strict union type and ensure nullable fields are handled
+      const mapped = (data || []).map((u: any) => ({
+        id: u.id,
+        full_name: u.full_name ?? null,
+        email: u.email ?? null,
+        role: (u.role === 'student' || u.role === 'coordinator' || u.role === 'admin') ? (u.role as UserRole) : null,
+        status: (u.status as UserStatus) ?? 'pending',
+        created_at: u.created_at ?? null,
+        record_type: u.record_type ?? null,
+      }));
+
+      setUsers(mapped);
     } catch (err: any) {
       console.error('Error fetching users:', err);
       setError(err.message || 'Failed to fetch users');

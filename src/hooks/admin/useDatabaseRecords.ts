@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+const sb = supabase as any;
 
 interface Table {
   id: string;
@@ -55,7 +56,7 @@ export const useDatabaseRecords = () => {
       setTablesLoading(true);
       setError(null);
       
-      const { data, error } = await supabase.rpc('get_all_tables');
+      const { data, error } = await sb.rpc('get_all_tables');
       
       if (error) throw error;
       
@@ -95,7 +96,7 @@ export const useDatabaseRecords = () => {
       // Extract schema and table name
       const [schema, name] = tableName.split('.');
       
-      const { data, error } = await supabase.rpc('get_table_columns', { 
+      const { data, error } = await sb.rpc('get_table_columns', { 
         p_schema_name: schema,
         p_table_name: name
       });
@@ -126,7 +127,7 @@ export const useDatabaseRecords = () => {
       const to = page * limit - 1;
       
       // Fetch records with count for pagination
-      const { data, error, count } = await supabase
+      const { data, error, count } = await sb
         .from(table)
         .select('*', { count: 'exact' })
         .range(from, to);

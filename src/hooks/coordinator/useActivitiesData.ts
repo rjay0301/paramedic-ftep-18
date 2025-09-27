@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { RecentActivity } from '@/types/coordinator';
 import { supabase } from '@/integrations/supabase/client';
+const sb = supabase as any;
 
 export const useActivitiesData = (userId: string | undefined, userRole: string | undefined, refreshCounter = 0) => {
   const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
@@ -14,13 +15,12 @@ export const useActivitiesData = (userId: string | undefined, userRole: string |
       setIsLoading(true);
       
       // Fetch recent form submissions as activities
-      const { data: submissions, error } = await supabase
-        .from('form_submissions')
+      const { data: submissions, error } = await sb
+        .from('assignments')
         .select(`
           id,
           student_id,
-          form_type,
-          form_number,
+          assignment_number,
           submitted_at,
           students:student_id (full_name)
         `)
@@ -43,18 +43,15 @@ export const useActivitiesData = (userId: string | undefined, userRole: string |
           }
         }
         
-        const formType = submission.form_type.replace(/_/g, ' ');
+        const formType = 'assignment';
         const formattedDate = new Date(submission.submitted_at).toLocaleString();
         
         // Assign colors based on form type
-        let color = 'blue';
-        if (formType.includes('assignment')) color = 'green';
-        if (formType.includes('evaluation')) color = 'yellow';
-        if (formType.includes('final')) color = 'red';
+        const color = 'green';
         
         return {
           id: submission.id,
-          description: `${studentName} submitted ${formType} #${submission.form_number}`,
+          description: `${studentName} submitted ${formType} #${submission.assignment_number}`,
           timestamp: formattedDate,
           color
         };

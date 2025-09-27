@@ -7,7 +7,8 @@ import { submitAssignment } from '@/services/formService';
 import { diagnosticService } from '@/services/form/utils/diagnosticService';
 import { dispatchFormSubmittedEvent } from '@/services/form/utils/eventUtils';
 import { supabase } from '@/integrations/supabase/client';
-
+const sb = supabase as any;
+  
 interface FormState {
   [key: string]: {
     content: string;
@@ -49,7 +50,7 @@ export const useAssignmentOperations = (
       const assignmentNumber = parseInt(assignmentKey.replace('assignment', ''));
       
       // Check if assignment exists
-      const { data: existingAssignment } = await supabase
+      const { data: existingAssignment } = await sb
         .from('assignments')
         .select('id')
         .eq('student_id', studentId)
@@ -58,7 +59,7 @@ export const useAssignmentOperations = (
         
       if (existingAssignment) {
         // Update existing assignment
-        await supabase
+        await sb
           .from('assignments')
           .update({
             content: { content: assignments[assignmentKey].content },
@@ -67,7 +68,7 @@ export const useAssignmentOperations = (
           .eq('id', existingAssignment.id);
       } else {
         // Create new draft assignment
-        await supabase
+        await sb
           .from('assignments')
           .insert({
             student_id: studentId,

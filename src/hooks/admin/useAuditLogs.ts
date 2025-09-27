@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+const sb = supabase as any;
 
 interface AuditLog {
   id: string;
@@ -51,7 +52,7 @@ export const useAuditLogs = () => {
       setError(null);
       
       // Build query for audit logs
-      let query = supabase
+      let query = sb
         .from('audit_logs')
         .select('*', { count: 'exact' })
         .order('created_at', { ascending: false })
@@ -68,9 +69,10 @@ export const useAuditLogs = () => {
       if (error) throw error;
       
       // Fetch user names for all unique user IDs
-      const userIds = Array.from(new Set(data
-        .map(log => log.user_id)
-        .filter(id => id !== null && id !== '00000000-0000-0000-0000-000000000000')));
+      const logsData = (data as any[]) || [];
+      const userIds = Array.from(new Set(logsData
+        .map((log: any) => log.user_id as string | null)
+        .filter((id: string | null) => id !== null && id !== '00000000-0000-0000-0000-000000000000'))) as string[];
       
       const userNames: Record<string, string> = {};
       
@@ -88,14 +90,14 @@ export const useAuditLogs = () => {
       }
       
       // Add user names to logs
-      const logsWithUserNames = data.map(log => ({
+      const logsWithUserNames = logsData.map((log: any) => ({
         ...log,
         user_name: log.user_id && log.user_id !== '00000000-0000-0000-0000-000000000000' 
           ? userNames[log.user_id] || 'Unknown User'
           : 'System'
       }));
       
-      setLogs(logsWithUserNames);
+      setLogs(logsWithUserNames as AuditLog[]);
       if (count !== null) setTotalCount(count);
       
     } catch (err: any) {
@@ -110,25 +112,25 @@ export const useAuditLogs = () => {
   const fetchAvailableFilters = useCallback(async () => {
     try {
       // Fetch available actions
-      const { data: actionData, error: actionError } = await supabase
+      const { data: actionData, error: actionError } = await sb
         .from('audit_logs')
         .select('action')
         .limit(1000);
       
       if (actionError) throw actionError;
       
-      const actions = Array.from(new Set(actionData.map(item => item.action)));
+      const actions = Array.from(new Set(((actionData as any[]) || []).map((item: any) => String(item.action || '')))).filter(Boolean) as string[];
       setAvailableActions(actions);
       
       // Fetch available tables
-      const { data: tableData, error: tableError } = await supabase
+      const { data: tableData, error: tableError } = await sb
         .from('audit_logs')
         .select('table_name')
         .limit(1000);
       
       if (tableError) throw tableError;
       
-      const tables = Array.from(new Set(tableData.map(item => item.table_name)));
+      const tables = Array.from(new Set(((tableData as any[]) || []).map((item: any) => String(item.table_name || '')))).filter(Boolean) as string[];
       setAvailableTables(tables);
       
     } catch (err: any) {

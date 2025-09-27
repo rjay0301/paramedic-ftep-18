@@ -14,6 +14,109 @@ export type Database = {
   }
   public: {
     Tables: {
+      assignments: {
+        Row: {
+          assignment_number: number
+          content: Json | null
+          created_at: string
+          id: string
+          status: string
+          student_id: string
+          submitted_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          assignment_number: number
+          content?: Json | null
+          created_at?: string
+          id?: string
+          status?: string
+          student_id: string
+          submitted_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          assignment_number?: number
+          content?: Json | null
+          created_at?: string
+          id?: string
+          status?: string
+          student_id?: string
+          submitted_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assignments_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "student_overall_progress"
+            referencedColumns: ["student_id"]
+          },
+          {
+            foreignKeyName: "assignments_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "student_phase_progress"
+            referencedColumns: ["student_id"]
+          },
+          {
+            foreignKeyName: "assignments_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audit_logs: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          new_data: Json | null
+          old_data: Json | null
+          record_id: string | null
+          table_name: string
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          new_data?: Json | null
+          old_data?: Json | null
+          record_id?: string | null
+          table_name: string
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          new_data?: Json | null
+          old_data?: Json | null
+          record_id?: string | null
+          table_name?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "admin_user_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       coordinators: {
         Row: {
           created_at: string
@@ -134,6 +237,13 @@ export type Database = {
             foreignKeyName: "student_submissions_phase_id_fkey"
             columns: ["phase_id"]
             isOneToOne: false
+            referencedRelation: "student_phase_progress"
+            referencedColumns: ["phase_id"]
+          },
+          {
+            foreignKeyName: "student_submissions_phase_id_fkey"
+            columns: ["phase_id"]
+            isOneToOne: false
             referencedRelation: "training_phases"
             referencedColumns: ["id"]
           },
@@ -156,6 +266,13 @@ export type Database = {
             columns: ["student_id"]
             isOneToOne: false
             referencedRelation: "student_overall_progress"
+            referencedColumns: ["student_id"]
+          },
+          {
+            foreignKeyName: "student_submissions_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "student_phase_progress"
             referencedColumns: ["student_id"]
           },
           {
@@ -253,11 +370,13 @@ export type Database = {
       student_overall_progress: {
         Row: {
           completed_forms: number | null
+          completed_phases: number | null
           full_name: string | null
           overall_percentage: number | null
           profile_id: string | null
           student_id: string | null
           total_forms: number | null
+          total_phases: number | null
         }
         Relationships: [
           {
@@ -276,6 +395,18 @@ export type Database = {
           },
         ]
       }
+      student_phase_progress: {
+        Row: {
+          completed_items: number | null
+          completion_percentage: number | null
+          is_complete: boolean | null
+          phase_id: string | null
+          phase_name: string | null
+          student_id: string | null
+          total_items: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       assign_user_role: {
@@ -285,6 +416,28 @@ export type Database = {
       delete_user: {
         Args: { user_id: string }
         Returns: undefined
+      }
+      get_all_tables: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          comment: string
+          name: string
+          record_count: number
+          schema: string
+        }[]
+      }
+      get_table_columns: {
+        Args: { p_schema_name: string; p_table_name: string }
+        Returns: {
+          is_nullable: boolean
+          is_primary_key: boolean
+          name: string
+          type: string
+        }[]
+      }
+      recalculate_student_progress: {
+        Args: { p_student_id: string }
+        Returns: boolean
       }
     }
     Enums: {
