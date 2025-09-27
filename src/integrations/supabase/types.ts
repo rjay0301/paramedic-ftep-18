@@ -14,13 +14,278 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      coordinators: {
+        Row: {
+          created_at: string
+          department: string | null
+          id: string
+          position: string | null
+          profile_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          department?: string | null
+          id?: string
+          position?: string | null
+          profile_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          department?: string | null
+          id?: string
+          position?: string | null
+          profile_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coordinators_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "admin_user_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coordinators_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          corp_id: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          role: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          corp_id?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          role?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          corp_id?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          role?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      student_submissions: {
+        Row: {
+          created_at: string
+          form_data: Json | null
+          id: string
+          phase_id: string
+          reviewed_at: string | null
+          reviewer_id: string | null
+          status: string
+          student_id: string
+          submitted_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          form_data?: Json | null
+          id?: string
+          phase_id: string
+          reviewed_at?: string | null
+          reviewer_id?: string | null
+          status?: string
+          student_id: string
+          submitted_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          form_data?: Json | null
+          id?: string
+          phase_id?: string
+          reviewed_at?: string | null
+          reviewer_id?: string | null
+          status?: string
+          student_id?: string
+          submitted_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_submissions_phase_id_fkey"
+            columns: ["phase_id"]
+            isOneToOne: false
+            referencedRelation: "training_phases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "student_submissions_reviewer_id_fkey"
+            columns: ["reviewer_id"]
+            isOneToOne: false
+            referencedRelation: "admin_user_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "student_submissions_reviewer_id_fkey"
+            columns: ["reviewer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "student_submissions_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "student_overall_progress"
+            referencedColumns: ["student_id"]
+          },
+          {
+            foreignKeyName: "student_submissions_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      students: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          profile_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          profile_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          profile_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "students_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "admin_user_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "students_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      training_phases: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          order_index: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          order_index?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          order_index?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
-      [_ in never]: never
+      admin_user_view: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          full_name: string | null
+          id: string | null
+          record_type: string | null
+          role: string | null
+          status: string | null
+        }
+        Relationships: []
+      }
+      student_overall_progress: {
+        Row: {
+          completed_forms: number | null
+          full_name: string | null
+          overall_percentage: number | null
+          profile_id: string | null
+          student_id: string | null
+          total_forms: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "students_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "admin_user_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "students_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
-      [_ in never]: never
+      assign_user_role: {
+        Args: { p_role: string; p_user_id: string }
+        Returns: boolean
+      }
+      delete_user: {
+        Args: { user_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
