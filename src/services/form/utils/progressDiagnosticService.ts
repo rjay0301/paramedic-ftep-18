@@ -1,5 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
+const sb = supabase as any;
 import { logger } from './loggerService';
 import { phaseFormCounts, formTypeToPhase } from '../constants/phaseConstants';
 
@@ -12,7 +13,7 @@ export const progressDiagnosticService = {
     
     try {
       // 1. Check form submissions
-      const { data: submissions, error: submissionsError } = await supabase
+      const { data: submissions, error: submissionsError } = await sb
         .from('form_submissions')
         .select('*')
         .eq('student_id', studentId);
@@ -27,7 +28,7 @@ export const progressDiagnosticService = {
       }
       
       // 2. Get phase progress
-      const { data: phaseProgress, error: phaseError } = await supabase
+      const { data: phaseProgress, error: phaseError } = await sb
         .from('student_phase_progress')
         .select('*')
         .eq('student_id', studentId);
@@ -42,7 +43,7 @@ export const progressDiagnosticService = {
       }
       
       // 3. Get overall progress
-      const { data: overallProgress, error: progressError } = await supabase
+      const { data: overallProgress, error: progressError } = await sb
         .from('student_overall_progress')
         .select('*')
         .eq('student_id', studentId)
@@ -147,7 +148,7 @@ export const progressDiagnosticService = {
       }
       
       // Get all form submissions for this student
-      const { data: submissions, error: submissionsError } = await supabase
+      const { data: submissions, error: submissionsError } = await sb
         .from('form_submissions')
         .select('id, form_type, form_number, status, submitted_at')
         .eq('student_id', studentId);
@@ -205,7 +206,7 @@ export const progressDiagnosticService = {
         const completionPercentage = Math.round((completedItems / totalItems) * 100);
         const isComplete = completedItems >= totalItems;
         
-        const { error: phaseUpdateError } = await supabase
+        const { error: phaseUpdateError } = await sb
           .from('student_phase_progress')
           .upsert({
             student_id: studentId,
@@ -234,7 +235,7 @@ export const progressDiagnosticService = {
       
       // Update overall progress
       const overallPercentage = Math.round((totalCompletedForms / totalFormCount) * 100);
-      const { error: overallUpdateError } = await supabase
+      const { error: overallUpdateError } = await sb
         .from('student_overall_progress')
         .upsert({
           student_id: studentId,

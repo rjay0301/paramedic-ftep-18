@@ -1,5 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
+const sb = supabase as any;
 import { ValidTableName } from '@/types/forms';
 import { toast } from 'sonner';
 
@@ -39,7 +40,7 @@ export const checkFormExists = async (
     }
     
     // Query to check if form exists
-    const { data, error } = await supabase
+    const { data, error } = await sb
       .from(formType)
       .select('id')
       .eq('student_id', studentId)
@@ -74,7 +75,7 @@ export const checkFormSubmissionExists = async (
   formNumber: number
 ): Promise<boolean> => {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await sb
       .from('form_submissions')
       .select('id')
       .eq('student_id', studentId)

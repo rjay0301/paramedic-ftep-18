@@ -1,5 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
+const sb = supabase as any;
 import { logger } from '../utils/loggerService';
 
 /**
@@ -11,9 +12,9 @@ export const recalculateAllStudentProgress = async (): Promise<boolean> => {
     logger.info('Starting recalculation of progress for all students');
     
     // Get all students
-    const { data: students, error: studentsError } = await supabase
-      .from('students')
-      .select('profile_id');
+  const { data: students, error: studentsError } = await sb
+    .from('students')
+    .select('profile_id');
       
     if (studentsError) {
       logger.error('Error fetching students for progress recalculation', studentsError);
@@ -47,11 +48,11 @@ export const recalculateAllStudentProgress = async (): Promise<boolean> => {
 async function updateStudentProgressInDbOnly(studentId: string): Promise<boolean> {
   try {
     // Get all submitted form submissions
-    const { data: submissions, error: submissionsError } = await supabase
-      .from('form_submissions')
-      .select('form_type, form_number')
-      .eq('student_id', studentId)
-      .eq('status', 'submitted');
+  const { data: submissions, error: submissionsError } = await sb
+    .from('form_submissions')
+    .select('form_type, form_number')
+    .eq('student_id', studentId)
+    .eq('status', 'submitted');
       
     if (submissionsError) {
       logger.error('Error fetching submissions for progress recalculation', submissionsError, { studentId });
@@ -64,15 +65,15 @@ async function updateStudentProgressInDbOnly(studentId: string): Promise<boolean
     const percentage = totalForms > 0 ? Math.round((completedForms / totalForms) * 100) : 0;
     
     // Update the student's progress in student_progress
-    const { error: updateError } = await supabase
-      .from('student_progress')
-      .upsert({
-        student_id: studentId,
-        completed_forms: completedForms,
-        total_forms: totalForms,
-        percentage: percentage,
-        updated_at: new Date().toISOString()
-      });
+  const { error: updateError } = await sb
+    .from('student_progress')
+    .upsert({
+      student_id: studentId,
+      completed_forms: completedForms,
+      total_forms: totalForms,
+      percentage: percentage,
+      updated_at: new Date().toISOString()
+    });
       
     if (updateError) {
       logger.error('Error updating student_progress', updateError, { studentId });

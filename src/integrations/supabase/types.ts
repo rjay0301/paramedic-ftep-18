@@ -14,6 +14,61 @@ export type Database = {
   }
   public: {
     Tables: {
+      addendum_forms: {
+        Row: {
+          content: Json | null
+          created_at: string
+          form_type: string
+          id: string
+          status: string
+          student_id: string
+          submitted_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          content?: Json | null
+          created_at?: string
+          form_type: string
+          id?: string
+          status?: string
+          student_id: string
+          submitted_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          content?: Json | null
+          created_at?: string
+          form_type?: string
+          id?: string
+          status?: string
+          student_id?: string
+          submitted_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "addendum_forms_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "student_overall_progress"
+            referencedColumns: ["student_id"]
+          },
+          {
+            foreignKeyName: "addendum_forms_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "student_phase_progress"
+            referencedColumns: ["student_id"]
+          },
+          {
+            foreignKeyName: "addendum_forms_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       assignments: {
         Row: {
           assignment_number: number
@@ -162,6 +217,58 @@ export type Database = {
           },
         ]
       }
+      form_drafts: {
+        Row: {
+          created_at: string
+          form_data: Json | null
+          form_identifier: string
+          form_type: string
+          id: string
+          last_saved_at: string
+          student_id: string
+        }
+        Insert: {
+          created_at?: string
+          form_data?: Json | null
+          form_identifier: string
+          form_type: string
+          id?: string
+          last_saved_at?: string
+          student_id: string
+        }
+        Update: {
+          created_at?: string
+          form_data?: Json | null
+          form_identifier?: string
+          form_type?: string
+          id?: string
+          last_saved_at?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_drafts_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "student_overall_progress"
+            referencedColumns: ["student_id"]
+          },
+          {
+            foreignKeyName: "form_drafts_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "student_phase_progress"
+            referencedColumns: ["student_id"]
+          },
+          {
+            foreignKeyName: "form_drafts_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       form_revisions: {
         Row: {
           content: Json | null
@@ -268,6 +375,91 @@ export type Database = {
         }
         Relationships: []
       }
+      instructional_case_summaries: {
+        Row: {
+          areas_to_improve: string | null
+          cfs_number: string | null
+          chief_complaint: string | null
+          clinical_performance: Json | null
+          created_at: string
+          date: string | null
+          ftp_feedback: string | null
+          ftp_signature: string | null
+          id: string
+          medications_administered: string | null
+          performed_well: string | null
+          priority: string | null
+          skills_performed: string | null
+          status: string
+          student_id: string
+          student_signature: string | null
+          summary_number: number
+          updated_at: string
+        }
+        Insert: {
+          areas_to_improve?: string | null
+          cfs_number?: string | null
+          chief_complaint?: string | null
+          clinical_performance?: Json | null
+          created_at?: string
+          date?: string | null
+          ftp_feedback?: string | null
+          ftp_signature?: string | null
+          id?: string
+          medications_administered?: string | null
+          performed_well?: string | null
+          priority?: string | null
+          skills_performed?: string | null
+          status?: string
+          student_id: string
+          student_signature?: string | null
+          summary_number: number
+          updated_at?: string
+        }
+        Update: {
+          areas_to_improve?: string | null
+          cfs_number?: string | null
+          chief_complaint?: string | null
+          clinical_performance?: Json | null
+          created_at?: string
+          date?: string | null
+          ftp_feedback?: string | null
+          ftp_signature?: string | null
+          id?: string
+          medications_administered?: string | null
+          performed_well?: string | null
+          priority?: string | null
+          skills_performed?: string | null
+          status?: string
+          student_id?: string
+          student_signature?: string | null
+          summary_number?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "instructional_case_summaries_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "student_overall_progress"
+            referencedColumns: ["student_id"]
+          },
+          {
+            foreignKeyName: "instructional_case_summaries_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "student_phase_progress"
+            referencedColumns: ["student_id"]
+          },
+          {
+            foreignKeyName: "instructional_case_summaries_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           corp_id: string | null
@@ -300,6 +492,58 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      student_progress: {
+        Row: {
+          completed_forms: number
+          created_at: string
+          id: string
+          percentage: number
+          student_id: string
+          total_forms: number
+          updated_at: string
+        }
+        Insert: {
+          completed_forms?: number
+          created_at?: string
+          id?: string
+          percentage?: number
+          student_id: string
+          total_forms?: number
+          updated_at?: string
+        }
+        Update: {
+          completed_forms?: number
+          created_at?: string
+          id?: string
+          percentage?: number
+          student_id?: string
+          total_forms?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_progress_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: true
+            referencedRelation: "student_overall_progress"
+            referencedColumns: ["student_id"]
+          },
+          {
+            foreignKeyName: "student_progress_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: true
+            referencedRelation: "student_phase_progress"
+            referencedColumns: ["student_id"]
+          },
+          {
+            foreignKeyName: "student_progress_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: true
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       student_submissions: {
         Row: {

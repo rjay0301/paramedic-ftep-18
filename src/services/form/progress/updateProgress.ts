@@ -1,5 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
+const sb = supabase as any;
 import { toast } from 'sonner';
 import { updateProgressRecord } from '../utils/dbUpdateUtils';
 import { phaseFormCounts, totalFormCount, formTypeToPhase } from '../constants/phaseConstants';
@@ -14,10 +15,10 @@ export const updateStudentProgress = async (studentId: string): Promise<void> =>
     logger.info(`Updating progress for student: ${studentId}`);
     
     // Get all form submissions for this student
-    const { data: submissions, error: submissionsError } = await supabase
-      .from('form_submissions')
-      .select('id, form_type, form_number, status, submitted_at')
-      .eq('student_id', studentId);
+  const { data: submissions, error: submissionsError } = await sb
+    .from('form_submissions')
+    .select('id, form_type, form_number, status, submitted_at')
+    .eq('student_id', studentId);
 
     if (submissionsError) {
       if (submissionsError.code === 'PGRST116') {
@@ -112,12 +113,12 @@ const updatePhaseProgress = async (
     const isComplete = completedItems >= totalItems;
     
     // Check if phase progress record exists
-    const { data: existingProgress, error: checkError } = await supabase
-      .from('student_phase_progress')
-      .select('id')
-      .eq('student_id', studentId)
-      .eq('phase_name', phase)
-      .maybeSingle();
+  const { data: existingProgress, error: checkError } = await sb
+    .from('student_phase_progress')
+    .select('student_id')
+    .eq('student_id', studentId)
+    .eq('phase_name', phase)
+    .maybeSingle();
       
     if (checkError && checkError.code === 'PGRST116') {
       // Table doesn't exist - silently return in offline mode
@@ -127,7 +128,7 @@ const updatePhaseProgress = async (
 
     if (existingProgress) {
       // Update existing phase progress
-      const { error } = await supabase
+      const { error } = await sb
         .from('student_phase_progress')
         .update({
           total_items: totalItems,
@@ -145,7 +146,7 @@ const updatePhaseProgress = async (
       }
     } else {
       // Insert new phase progress
-      const { error } = await supabase
+      const { error } = await sb
         .from('student_phase_progress')
         .insert({
           student_id: studentId,

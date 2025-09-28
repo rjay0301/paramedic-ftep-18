@@ -1,6 +1,6 @@
 
-import { PostgrestSingleResponse } from '@supabase/postgrest-js';
 import { supabase } from '@/integrations/supabase/client';
+const sb = supabase as any;
 
 /**
  * Save a form as a draft
@@ -15,9 +15,9 @@ export async function saveFormDraft<T extends Record<string, any>>(
   formIdentifier: string,
   studentId: string,
   formData: T
-): Promise<PostgrestSingleResponse<any>> {
+): Promise<any> {
   // Check if a draft already exists
-  const { data: existingDraft } = await supabase
+  const { data: existingDraft } = await sb
     .from('form_drafts')
     .select('*')
     .eq('form_type', formType)
@@ -27,7 +27,7 @@ export async function saveFormDraft<T extends Record<string, any>>(
 
   if (existingDraft) {
     // Update existing draft
-    return supabase
+    return sb
       .from('form_drafts')
       .update({
         form_data: formData,
@@ -38,7 +38,7 @@ export async function saveFormDraft<T extends Record<string, any>>(
       .single();
   } else {
     // Create new draft
-    return supabase
+    return sb
       .from('form_drafts')
       .insert({
         form_type: formType,
@@ -63,7 +63,7 @@ export async function getFormDraft<T extends Record<string, any>>(
   formIdentifier: string,
   studentId: string
 ): Promise<T | null> {
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from('form_drafts')
     .select('form_data')
     .eq('form_type', formType)
@@ -89,7 +89,7 @@ export async function deleteFormDraft(
   formIdentifier: string,
   studentId: string
 ): Promise<void> {
-  await supabase
+  await sb
     .from('form_drafts')
     .delete()
     .eq('form_type', formType)

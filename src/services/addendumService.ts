@@ -1,5 +1,5 @@
-import { PostgrestSingleResponse } from '@supabase/postgrest-js';
 import { supabase } from '@/integrations/supabase/client';
+const sb = supabase as any;
 import { FormDataValue } from '@/types/forms';
 import { AddendumForm, AddendumFormType } from '@/types/addendum';
 
@@ -18,9 +18,9 @@ export async function saveAddendumForm(
   content: Record<string, FormDataValue>,
   status: 'draft' | 'submitted' | 'approved' | 'rejected' = 'draft',
   submittedAt?: string
-): Promise<PostgrestSingleResponse<AddendumForm>> {
+): Promise<any> {
   // Check if the form already exists
-  const { data: existingForm } = await supabase
+  const { data: existingForm } = await sb
     .from('addendum_forms')
     .select('id')
     .eq('student_id', studentId)
@@ -29,7 +29,7 @@ export async function saveAddendumForm(
 
   if (existingForm) {
     // Update existing form
-    return supabase
+    return sb
       .from('addendum_forms')
       .update({
         content,
@@ -42,7 +42,7 @@ export async function saveAddendumForm(
       .single();
   } else {
     // Create new form
-    return supabase
+    return sb
       .from('addendum_forms')
       .insert({
         student_id: studentId,
@@ -66,7 +66,7 @@ export async function getAddendumForm(
   studentId: string,
   formType: AddendumFormType
 ): Promise<Record<string, FormDataValue> | null> {
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from('addendum_forms')
     .select('content')
     .eq('student_id', studentId)
@@ -91,7 +91,7 @@ export async function getAddendumFormStatus(
   studentId: string,
   formType: AddendumFormType
 ): Promise<string | null> {
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from('addendum_forms')
     .select('status')
     .eq('student_id', studentId)
@@ -115,7 +115,7 @@ export async function deleteAddendumForm(
   studentId: string,
   formType: AddendumFormType
 ): Promise<void> {
-  const { error } = await supabase
+  const { error } = await sb
     .from('addendum_forms')
     .delete()
     .eq('student_id', studentId)

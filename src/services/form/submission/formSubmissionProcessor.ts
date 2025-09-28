@@ -1,5 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
+const sb = supabase as any;
 import { updateStudentProgress } from '../progress';
 import { dispatchFormSubmittedEvent } from '../utils/eventUtils';
 import { logger } from '../utils/loggerService';
@@ -32,7 +33,7 @@ export const submitForm = async (
     });
     
     // Update the specific form table
-    const formUpdateResponse = await supabase
+    const formUpdateResponse = await sb
       .from(formType)
       .update({ 
         status: 'submitted',
@@ -58,7 +59,7 @@ export const submitForm = async (
     }
     
     // Update the form_submissions table
-    const submissionResponse = await supabase
+    const submissionResponse = await sb
       .from('form_submissions')
       .upsert({
         student_id: studentId,
