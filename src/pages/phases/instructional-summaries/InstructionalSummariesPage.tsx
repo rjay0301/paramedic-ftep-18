@@ -64,7 +64,7 @@ const InstructionalSummariesPage = () => {
       setError(null);
       
       try {
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
           .from('instructional_case_summaries')
           .select('*')
           .eq('student_id', user.id)
@@ -140,7 +140,7 @@ const InstructionalSummariesPage = () => {
     if (!user?.id) return;
     
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('instructional_case_summaries')
         .upsert([{
           ...summaryData,

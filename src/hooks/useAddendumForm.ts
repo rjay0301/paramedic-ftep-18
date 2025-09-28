@@ -21,7 +21,7 @@ export function useAddendumForm(studentId: string, formType: AddendumFormType) {
   const { data: formStatus } = useQuery({
     queryKey: ['addendumFormStatus', studentId, formType],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('addendum_forms')
         .select('status')
         .eq('student_id', studentId)
@@ -122,7 +122,7 @@ export function useAddendumForm(studentId: string, formType: AddendumFormType) {
       }
       
       // Count all submitted addendum forms for the phase
-      const { data: addendumForms, error: countError } = await supabase
+      const { data: addendumForms, error: countError } = await (supabase as any)
         .from('addendum_forms')
         .select('id')
         .eq('student_id', studentId)
@@ -162,7 +162,7 @@ export function useAddendumForm(studentId: string, formType: AddendumFormType) {
       );
       
       // Update the phase progress
-      const { error: updateError } = await supabase
+      const { error: updateError } = await (supabase as any)
         .from('student_phase_progress')
         .update({
           completed_items: totalCompleted,
@@ -215,7 +215,7 @@ export function useAddendumForm(studentId: string, formType: AddendumFormType) {
         : 0;
       
       // Update overall progress
-      const { error: updateError } = await supabase
+      const { error: updateError } = await (supabase as any)
         .from('student_overall_progress')
         .update({
           completed_forms: completedForms,

@@ -20,7 +20,7 @@ export const useFetchProfile = () => {
         setIsLoading(true);
         
         // First get student data
-        const { data: studentData, error } = await supabase
+        const { data: studentData, error } = await (supabase as any)
           .from('students')
           .select('*')
           .eq('profile_id', user.id)
@@ -39,7 +39,7 @@ export const useFetchProfile = () => {
           
           // Fallback to getting hub name from hub_id if hub_name is not available
           if (!hubName && studentData.hub_id) {
-            const { data: hubData } = await supabase
+            const { data: hubData } = await (supabase as any)
               .from('hubs')
               .select('name')
               .eq('id', studentData.hub_id)
@@ -49,7 +49,7 @@ export const useFetchProfile = () => {
               hubName = hubData.name;
               
               // Update the hub_name in students table for future use
-              await supabase
+              await (supabase as any)
                 .from('students')
                 .update({ hub_name: hubName })
                 .eq('id', studentData.id);
@@ -112,7 +112,7 @@ export const useFetchProfile = () => {
             let hubName = payload.new.hub_name || '';
             
             if (!hubName && payload.new.hub_id) {
-              const { data: hubData } = await supabase
+              const { data: hubData } = await (supabase as any)
                 .from('hubs')
                 .select('name')
                 .eq('id', payload.new.hub_id)

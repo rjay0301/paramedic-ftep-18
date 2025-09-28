@@ -17,7 +17,7 @@ export const useStudentsData = (userId: string | undefined, userRole: string | u
       
       // Fetch only active students with valid profile associations
       // Added filter to only get records with role 'student'
-      const { data: studentData, error } = await supabase
+      const { data: studentData, error } = await (supabase as any)
         .from('students')
         .select(`
           id,
@@ -43,7 +43,7 @@ export const useStudentsData = (userId: string | undefined, userRole: string | u
       }
 
       // Fetch hubs for fallback
-      const { data: hubsData } = await supabase
+      const { data: hubsData } = await (supabase as any)
         .from('hubs')
         .select('id, name');
       
@@ -51,7 +51,7 @@ export const useStudentsData = (userId: string | undefined, userRole: string | u
 
       // Fetch progress data with detailed logging
       console.log('Fetching student progress data...');
-      const { data: progressData, error: progressError } = await supabase
+      const { data: progressData, error: progressError } = await (supabase as any)
         .from('student_overall_progress')
         .select('*');
 
@@ -65,7 +65,7 @@ export const useStudentsData = (userId: string | undefined, userRole: string | u
 
       // Fetch form submissions for detailed records
       console.log('Fetching form submissions...');
-      const { data: formSubmissions, error: submissionsError } = await supabase
+      const { data: formSubmissions, error: submissionsError } = await (supabase as any)
         .from('form_submissions')
         .select('id, form_type, form_number, student_id, submitted_at, status')
         .eq('status', 'submitted')
@@ -113,7 +113,7 @@ export const useStudentsData = (userId: string | undefined, userRole: string | u
             continue;
           }
           
-          const progress = progressMap.get(student.id);
+          const progress: any = progressMap.get(student.id);
           let phase = 'Not Started';
           let progressPercentage = 0;
           

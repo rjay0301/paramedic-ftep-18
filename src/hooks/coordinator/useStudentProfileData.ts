@@ -36,7 +36,7 @@ export const useStudentProfileData = (student: Student) => {
       setIsLoading(true);
 
       // Update the student record
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('students')
         .update({
           alpha_unit_text: formData.alphaUnit,

@@ -162,6 +162,112 @@ export type Database = {
           },
         ]
       }
+      form_revisions: {
+        Row: {
+          content: Json | null
+          created_at: string
+          created_by: string | null
+          form_submission_id: string
+          id: string
+          revision_number: number
+        }
+        Insert: {
+          content?: Json | null
+          created_at?: string
+          created_by?: string | null
+          form_submission_id: string
+          id?: string
+          revision_number: number
+        }
+        Update: {
+          content?: Json | null
+          created_at?: string
+          created_by?: string | null
+          form_submission_id?: string
+          id?: string
+          revision_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_revisions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "admin_user_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "form_revisions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "form_revisions_form_submission_id_fkey"
+            columns: ["form_submission_id"]
+            isOneToOne: false
+            referencedRelation: "form_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      form_submissions: {
+        Row: {
+          created_at: string
+          form_id: string
+          form_number: number
+          form_type: string
+          id: string
+          status: string
+          student_id: string
+          submitted_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          form_id: string
+          form_number: number
+          form_type: string
+          id?: string
+          status?: string
+          student_id: string
+          submitted_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          form_id?: string
+          form_number?: number
+          form_type?: string
+          id?: string
+          status?: string
+          student_id?: string
+          submitted_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      hubs: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           corp_id: string | null
@@ -286,29 +392,47 @@ export type Database = {
       }
       students: {
         Row: {
+          alpha_unit_text: string | null
           created_at: string
           email: string | null
+          ftp_contact: string | null
+          ftp_name: string | null
           full_name: string | null
+          hub_id: string | null
+          hub_name: string | null
           id: string
           profile_id: string
+          role: string | null
           status: string
           updated_at: string
         }
         Insert: {
+          alpha_unit_text?: string | null
           created_at?: string
           email?: string | null
+          ftp_contact?: string | null
+          ftp_name?: string | null
           full_name?: string | null
+          hub_id?: string | null
+          hub_name?: string | null
           id?: string
           profile_id: string
+          role?: string | null
           status?: string
           updated_at?: string
         }
         Update: {
+          alpha_unit_text?: string | null
           created_at?: string
           email?: string | null
+          ftp_contact?: string | null
+          ftp_name?: string | null
           full_name?: string | null
+          hub_id?: string | null
+          hub_name?: string | null
           id?: string
           profile_id?: string
+          role?: string | null
           status?: string
           updated_at?: string
         }

@@ -18,7 +18,7 @@ export const useStudentOperations = (
     
     try {
       // Update student in Supabase
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('students')
         .update({
           alpha_unit_text: updatedStudent.alphaUnit,

@@ -59,6 +59,12 @@ export const usePdfGeneration = () => {
         throw new Error('Failed to retrieve assignment');
       }
       
+      const submission = {
+        form_type: 'assignments',
+        form_number: assignment.assignment_number,
+        submitted_at: assignment.submitted_at
+      };
+
       console.log("Form submission details:", submission);
       
       // Get the actual form data
