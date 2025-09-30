@@ -74,7 +74,7 @@ export const submitForm = async (
     console.log(`Submitting form: ${formType} #${formNumber} for student ${studentId}`);
     
     // Update the specific form table
-    const formUpdateResponse = await supabase
+    const formUpdateResponse = await (supabase as any)
       .from(formType)
       .update({ 
         status: 'submitted',

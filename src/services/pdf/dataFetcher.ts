@@ -52,8 +52,8 @@ export const fetchPhaseFormData = async (studentId: string, phaseType: PhaseType
         console.log(`Fetching content for ${submission.form_type} #${submission.form_number} (ID: ${submission.form_id})`);
         
         // We need to use type assertion here to work with the dynamic form types
-        const { data: formData, error: formError } = await supabase
-          .from(submission.form_type as any)
+        const { data: formData, error: formError } = await (supabase as any)
+          .from(submission.form_type)
           .select('*')
           .eq('id', submission.form_id)
           .single();
@@ -69,16 +69,16 @@ export const fetchPhaseFormData = async (studentId: string, phaseType: PhaseType
           // For assignments, extract content properly
           let processedContent = formData;
           if (submission.form_type === 'assignments') {
-            console.log('Assignment raw content:', formData.content);
+            console.log('Assignment raw content:', (formData as any).content);
             
             // Ensure we have valid content data
-            if (formData.content) {
+            if ((formData as any).content) {
               // Try to parse the content if it's a string
-              if (typeof formData.content === 'string' && formData.content.trim().startsWith('{')) {
+              if (typeof (formData as any).content === 'string' && (formData as any).content.trim().startsWith('{')) {
                 try {
                   processedContent = {
                     ...formData,
-                    content: JSON.parse(formData.content)
+                    content: JSON.parse((formData as any).content)
                   };
                 } catch (e) {
                   // If parsing fails, keep the original content
@@ -125,8 +125,8 @@ export const fetchFormById = async (formId: string): Promise<FormData | null> =>
     }
     
     // Then fetch the actual form data
-    const { data: formData, error: formError } = await supabase
-      .from(submission.form_type as any)
+    const { data: formData, error: formError } = await (supabase as any)
+      .from(submission.form_type)
       .select('*')
       .eq('id', submission.form_id)
       .single();
@@ -138,16 +138,16 @@ export const fetchFormById = async (formId: string): Promise<FormData | null> =>
     
     // Extract and process content properly based on form type
     let processedContent = formData;
-    if (submission.form_type === 'assignments' && formData.content) {
+    if (submission.form_type === 'assignments' && (formData as any).content) {
       console.log('Processing assignment content for form ID:', formId);
-      console.log('Raw content:', formData.content);
+      console.log('Raw content:', (formData as any).content);
       
       // Special handling for assignments to ensure content is extracted properly
-      if (typeof formData.content === 'string' && formData.content.trim().startsWith('{')) {
+      if (typeof (formData as any).content === 'string' && (formData as any).content.trim().startsWith('{')) {
         try {
           processedContent = {
             ...formData,
-            content: JSON.parse(formData.content)
+            content: JSON.parse((formData as any).content)
           };
         } catch (e) {
           console.error('Error parsing assignment content:', e);

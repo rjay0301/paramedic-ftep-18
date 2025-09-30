@@ -53,10 +53,8 @@ export const getStudentInfo = async (studentId: string): Promise<StudentInfo | n
         profile_id,
         alpha_unit_text,
         hub_id,
-        ftp_id,
         ftp_name,
         ftp_contact,
-        program_start_date,
         status
       `)
       .eq('id', studentId)
@@ -67,7 +65,7 @@ export const getStudentInfo = async (studentId: string): Promise<StudentInfo | n
       return null;
     }
 
-    return data as StudentInfo || null;
+    return data as unknown as StudentInfo || null;
   } catch (error) {
     console.error('Error in getStudentInfo:', error);
     return null;
@@ -194,7 +192,7 @@ export const getStudentOverallProgress = async (studentId: string) => {
       
       // If no progress record exists, initialize one
       if (error.code === 'PGRST116') {
-        const { error: initError } = await supabase
+        const { error: initError } = await (supabase as any)
           .from('student_overall_progress')
           .insert({
             student_id: studentId,

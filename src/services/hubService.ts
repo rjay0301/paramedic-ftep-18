@@ -10,7 +10,7 @@ export const getHubs = async (): Promise<HubData[]> => {
   try {
     const { data, error } = await supabase
       .from('hubs')
-      .select('id, name, location')
+      .select('id, name')
       .order('name');
 
     if (error) {
