@@ -13,9 +13,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { clearAuthData } from '@/contexts/auth/authUtils';
 import { useInitialAdminSetup } from '@/hooks/admin/useInitialAdminSetup';
-
+import { useAuth } from '@/contexts/auth';
 const Login = () => {
   const navigate = useNavigate();
+  const { user, session, isLoading: authLoading } = useAuth();
   const { needsSetup, checkIfAdminExists } = useInitialAdminSetup();
   const [showAdminSetup, setShowAdminSetup] = useState(false);
   const {
@@ -67,6 +68,15 @@ const Login = () => {
     // Track page visit for debugging
     console.log('Login page visit:', new Date().toISOString());
   }, []);
+
+  // Redirect authenticated users to their dashboards
+  useEffect(() => {
+    if (authLoading) return;
+    if (user && session) {
+      const target = user.role === 'admin' ? '/admin' : user.role === 'coordinator' ? '/coordinator' : '/dashboard';
+      navigate(target, { replace: true });
+    }
+  }, [user?.role, session, authLoading, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-blue-50 to-primary-100">
