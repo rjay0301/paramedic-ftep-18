@@ -15,7 +15,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles }) => {
   const location = useLocation();
 
   if (isLoading) {
-    return <LoadingScreen message="Verifying your access..." timeout={1000} />;
+    return <LoadingScreen message="Verifying your access..." timeout={8000} />;
   }
 
   if (!user || !session) {

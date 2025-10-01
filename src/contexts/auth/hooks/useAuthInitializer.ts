@@ -66,55 +66,65 @@ export const useAuthInitializer = (
     });
 
     // Then check for existing session
-    supabase.auth.getSession().then(async ({ data: { session: currentSession } }) => {
-      console.log("Initial session check:", currentSession ? "Has session" : "No session");
-      
-      if (!isMounted) return;
-      
-      setSession(currentSession);
-      
-      if (currentSession?.user) {
-        // Set basic user information first
-        const basicUser: EnhancedUser = {
-          ...currentSession.user,
-          role: null,
-          status: 'pending'
-        };
-        setUser(basicUser);
-        
-        try {
-          // Fetch user profile
-          const enhancedUser = await fetchProfile(currentSession.user.id);
-          if (isMounted && enhancedUser) {
-            setUser(enhancedUser);
-          }
-          
-          // Fetch profile data
-          const { data: profileData } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', currentSession.user.id)
-            .single();
-            
-          if (isMounted && profileData) {
-            setProfile(profileData as Profile);
-          }
-        } catch (err) {
-          console.error("Error enhancing user during initialization:", err);
-          if (isMounted) {
-            setError(err instanceof Error ? err : new Error('Failed to fetch user profile'));
+    const initializeAuth = async () => {
+      try {
+        const { data: { session: currentSession }, error: sessionError } = await supabase.auth.getSession();
+        console.log("Initial session check:", currentSession ? "Has session" : "No session");
+
+        if (!isMounted) return;
+
+        if (sessionError) {
+          console.error("Error getting session:", sessionError);
+          setIsLoading(false);
+          return;
+        }
+
+        setSession(currentSession);
+
+        if (currentSession?.user) {
+          const basicUser: EnhancedUser = {
+            ...currentSession.user,
+            role: null,
+            status: 'pending'
+          };
+          setUser(basicUser);
+
+          try {
+            const enhancedUser = await fetchProfile(currentSession.user.id);
+            if (isMounted && enhancedUser) {
+              setUser(enhancedUser);
+            }
+
+            const { data: profileData } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', currentSession.user.id)
+              .single();
+
+            if (isMounted && profileData) {
+              setProfile(profileData as Profile);
+            }
+          } catch (err) {
+            console.error("Error enhancing user during initialization:", err);
+            if (isMounted) {
+              setError(err instanceof Error ? err : new Error('Failed to fetch user profile'));
+            }
           }
         }
+
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      } catch (err) {
+        console.error("Error during auth initialization:", err);
+        if (isMounted) {
+          setError(err instanceof Error ? err : new Error('Failed to initialize authentication'));
+          setIsLoading(false);
+        }
       }
-      
-      setIsLoading(false);
-    }).catch(err => {
-      console.error("Error getting initial session:", err);
-      if (isMounted) {
-        setError(err instanceof Error ? err : new Error('Failed to get initial session'));
-        setIsLoading(false);
-      }
-    });
+    };
+
+    initializeAuth();
 
     return () => {
       isMounted = false;

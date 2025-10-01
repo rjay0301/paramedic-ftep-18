@@ -8,9 +8,9 @@ interface LoadingScreenProps {
   timeout?: number;
 }
 
-const LoadingScreen: React.FC<LoadingScreenProps> = ({ 
-  message = 'Loading...', 
-  timeout = 2000 // Further reduced default timeout to 2 seconds
+const LoadingScreen: React.FC<LoadingScreenProps> = ({
+  message = 'Loading...',
+  timeout = 10000
 }) => {
   const [showTimeout, setShowTimeout] = useState(false);
   const [showExtendedHelp, setShowExtendedHelp] = useState(false);
@@ -28,10 +28,8 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({
     
     // Extended help timer
     const extendedHelpTimer = setTimeout(() => {
-      if (showTimeout) {
-        setShowExtendedHelp(true);
-      }
-    }, timeout + 5000);
+      setShowExtendedHelp(true);
+    }, timeout + 3000);
     
     // Animate loading dots
     const dotsInterval = setInterval(() => {

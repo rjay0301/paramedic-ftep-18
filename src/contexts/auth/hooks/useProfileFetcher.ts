@@ -10,17 +10,19 @@ export const useProfileFetcher = () => {
   const fetchProfile = async (userId: string): Promise<EnhancedUser | null> => {
     try {
       console.log("Fetching profile for user:", userId);
-      
-      // First, get the current user data from Supabase
+      const fetchStartTime = Date.now();
+
       const { data: userData } = await supabase.auth.getUser();
       const currentUser = userData?.user;
-      
-      // Then fetch the profile data
+
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .single();
+
+      const fetchEndTime = Date.now();
+      console.log(`Profile fetch took: ${fetchEndTime - fetchStartTime}ms`);
       
       if (profileError) {
         console.error("Error fetching profile:", profileError);
