@@ -28,18 +28,18 @@ const UserProfile = lazy(() => import('@/pages/UserProfile'));
 const AdminDashboard = lazy(() => import('@/pages/admin/AdminDashboard'));
 
 const AppRoutes: React.FC = () => {
-  const { isLoading, user } = useAuth();
+  const { isLoading, user, session } = useAuth();
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <LoadingScreen message="Loading..." />;
   }
 
-  // Smart redirect based on user role
   const getDefaultRoute = () => {
-    if (!user) return '/login';
+    if (!user || !session || user.status !== 'active') return '/login';
     if (user.role === 'admin') return '/admin';
     if (user.role === 'coordinator') return '/coordinator';
-    return '/dashboard';
+    if (user.role === 'student') return '/dashboard';
+    return '/login';
   };
 
   return (
@@ -51,7 +51,7 @@ const AppRoutes: React.FC = () => {
         <Route path="/pending-approval" element={<PendingApproval />} />
         <Route path="/admin-setup" element={<FirstTimeSetup />} />
 
-        {/* Protected routes */}
+        {/* Student routes */}
         <Route element={<ProtectedRoute allowedRoles={["student"]} />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/phases/assignments" element={<AssignmentsPage />} />
@@ -67,7 +67,6 @@ const AppRoutes: React.FC = () => {
           <Route path="/phases/declaration" element={<DeclarationPage />} />
           <Route path="/phases/reflective" element={<ReflectivePracticePage />} />
           <Route path="/phases/final-evaluation" element={<FinalEvaluationPage />} />
-          <Route path="/profile" element={<Profile />} />
         </Route>
 
         {/* Coordinator routes */}
@@ -79,6 +78,11 @@ const AppRoutes: React.FC = () => {
         {/* Admin routes */}
         <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
           <Route path="/admin" element={<AdminDashboard />} />
+        </Route>
+
+        {/* Shared routes for all authenticated users */}
+        <Route element={<ProtectedRoute allowedRoles={["admin", "coordinator", "student"]} />}>
+          <Route path="/profile" element={<Profile />} />
         </Route>
 
         {/* Catch all */}

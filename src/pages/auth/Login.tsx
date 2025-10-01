@@ -72,11 +72,12 @@ const Login = () => {
   // Redirect authenticated users to their dashboards
   useEffect(() => {
     if (authLoading) return;
-    if (user && session) {
+    if (user && session && user.status === 'active' && user.role) {
       const target = user.role === 'admin' ? '/admin' : user.role === 'coordinator' ? '/coordinator' : '/dashboard';
+      console.log(`Login: Redirecting authenticated user with role ${user.role} to ${target}`);
       navigate(target, { replace: true });
     }
-  }, [user?.role, session, authLoading, navigate]);
+  }, [user, session, authLoading, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-blue-50 to-primary-100">
