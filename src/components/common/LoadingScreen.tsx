@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { AlertCircle, Loader2, RefreshCw } from 'lucide-react';
+import { CircleAlert as AlertCircle, Loader as Loader2, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface LoadingScreenProps {
