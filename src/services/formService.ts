@@ -3,9 +3,9 @@
 
 // Re-export all functions from individual service files
 export * from './formCrud';
-export * from './formStudentOperations'; 
+export * from './formStudentOperations';
 export * from './formDrafts';
-export * from './form/formSubmissionService';
+export * from './form/submission/formSubmissionProcessor';
 export * from './hubService';
 export * from './phaseService';
 export * from './addendumService';
