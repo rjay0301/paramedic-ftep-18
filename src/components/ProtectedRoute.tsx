@@ -50,7 +50,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles }) => {
   if (allowedRoles && allowedRoles.length > 0 && user.role) {
     if (!allowedRoles.includes(user.role as UserRole) && !redirecting) {
       setRedirecting(true);
-      const redirectPath = user.role === 'coordinator' ? '/coordinator' : '/dashboard';
+      const redirectPath = user.role === 'admin' ? '/admin' 
+        : user.role === 'coordinator' ? '/coordinator' 
+        : '/dashboard';
       
       // Only show toast if we're not already at the target path
       if (location.pathname !== redirectPath) {

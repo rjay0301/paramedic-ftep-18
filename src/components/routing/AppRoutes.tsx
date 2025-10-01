@@ -32,9 +32,17 @@ const AppRoutes: React.FC = () => {
     return <div>Loading...</div>;
   }
 
+  // Smart redirect based on user role
+  const getDefaultRoute = () => {
+    if (!user) return '/login';
+    if (user.role === 'admin') return '/admin';
+    if (user.role === 'coordinator') return '/coordinator';
+    return '/dashboard';
+  };
+
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/" element={<Navigate to={getDefaultRoute()} replace />} />
       <Route path="/login" element={<Login />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/pending-approval" element={<PendingApproval />} />
